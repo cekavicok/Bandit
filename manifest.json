@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Bandid DEMO",
+  "version": "1.0",
+  "description": "Jednostavna demo ekstenzija za proveru phishing poruka.",
+  
+  "permissions": ["activeTab", "scripting"],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Proveri poruku"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
