@@ -1,0 +1,6 @@
+prepoznaje link kad se odgovori kao nesto 
+negativno sto ne bi smelo da se desava
+
+ne prepoznaje attachment extension uopste
+
+treba da gleda odgovore kao i originalni mejl u isto vreme*** 
