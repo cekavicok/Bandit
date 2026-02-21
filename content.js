@@ -20,32 +20,136 @@ function extractEmailText() {
 ===================================================== */
 
 const riskyWords = {
-    "hitno": {
-        points: 10,
-        description: "Koristi se da izazove paniku i ubrza reakciju."
-    },
-    "odmah": {
-        points: 10,
-        description: "Stvara pritisak da korisnik reaguje bez razmišljanja."
-    },
-    "verifikuj": {
-        points: 15,
-        description: "Često se koristi u phishing napadima za krađu podataka."
-    },
-    "lozinka": {
-        points: 20,
-        description: "Traženje lozinke je ozbiljan bezbednosni rizik."
-    },
-    "blokiran": {
-        points: 15,
-        description: "Lažna upozorenja o blokadi naloga su česta phishing taktika."
-    },
-    "skibidi": {
-        points: 5,
-        description: "MNOGO RIZIČNA REČ, MOŽE IZAZVATI SMRT OD SMEHA"
-    }
+    "hitno": { points: 8, description: "Izaziva osećaj hitnosti." },
+    "skibidi": { points: 5, description: "SKIBIDI SOLJA" },
+    "odmah|одмах": { points: 8, description: "Stvara pritisak za brzu reakciju." },
+    "poslednje upozorenje|последње упозорење": { points: 12, description: "Tipična phishing taktika pritiska." },
+    "u roku od 24 sata": { points: 10, description: "Veštački vremenski pritisak." },
+    "vaš nalog će biti ugašen|ваш налог ће бити угашен": { points: 15, description: "Pretnja gašenjem naloga." },
+
+    "blokiran|закључан налог": { points: 12, description: "Lažna blokada naloga." },
+    "suspendovan": { points: 12, description: "Navodna suspenzija naloga." },
+    "ograničen pristup": { points: 10, description: "Manipulacija pristupom nalogu." },
+
+    "verifikuj": { points: 12, description: "Zahtev za verifikaciju podataka." },
+    "potvrdite identitet": { points: 15, description: "Pokušaj krađe identiteta." },
+    "unesite lozinku|унесите лозинку": { points: 20, description: "Traženje lozinke je ozbiljan rizik." },
+    "ažurirajte podatke|ажурирајте податке": { points: 12, description: "Česta phishing formulacija." },
+    "resetujte lozinku|ресетујте лозинку": { points: 15, description: "Može biti pokušaj krađe naloga." },
+
+    "nagrada": { points: 10, description: "Lažno obećanje nagrade." },
+    "dobitnik": { points: 12, description: "Manipulacija dobitkom." },
+    "uplata": { points: 8, description: "Finansijska manipulacija." },
+    "račun je terećen|рачун је терећен": { points: 15, description: "Lažna finansijska transakcija." },
+    "neovlašćena transakcija|неовлашћена трансакција": { points: 18, description: "Izaziva paniku oko novca." },
+
+    "poverljivo": { points: 8, description: "Stvara osećaj tajnosti." },
+    "kliknite ovde|кликните овде": { points: 10, description: "Direktan poziv na akciju." },
+    "preuzmite dokument|преузмите документ": { points: 12, description: "Može voditi ka malware-u." },
+    "sigurnosna provera|сигурносна провера": { points: 10, description: "Lažno predstavljanje bezbednosti." },
+    "osigurajte nalog|осигурајте налог": { points: 12, description: "Poziv na akciju, može biti phishing." },
+    "otvorite odmah|отворите одмах": { points: 10, description: "Pritisak da se odmah otvori link ili attachment." },
+    "odmah preuzmite|одмах преузмите": { points: 10, description: "Pritisak da korisnik odmah preuzme fajl." }
 };
 
+function analyzeSender() {
+
+    let senderScore = 0;
+    let reasons = [];
+
+    const senderElement = document.querySelector('span[email]');
+    if (!senderElement) return { senderScore, reasons };
+
+    const senderEmail = senderElement.getAttribute("email").toLowerCase();
+
+    // 🔴 1. Noreply sa čudnim domenom
+    if (senderEmail.startsWith("noreply") || senderEmail.startsWith("no-reply")) {
+        if (!senderEmail.includes(".com") && !senderEmail.includes(".rs")) {
+            senderScore += 10;
+            reasons.push("Noreply adresa sa neobičnim domenom.");
+        }
+    }
+
+    // 🔴 2. Sumnjivi TLD
+    const suspiciousTLDs = [".cc", ".ru", ".xyz", ".top", ".click", ".tk"];
+    suspiciousTLDs.forEach(tld => {
+        if (senderEmail.includes(tld)) {
+            senderScore += 15;
+            reasons.push(`Pošiljalac koristi sumnjiv TLD (${tld}).`);
+        }
+    });
+
+    // 🔴 3. Banka + secure + random domen
+    if (senderEmail.includes("banka") && senderEmail.includes("secure")) {
+        if (!senderEmail.includes(".com") && !senderEmail.includes(".rs")) {
+            senderScore += 20;
+            reasons.push("Lažno predstavljanje banke sa nelegitimnim domenom.");
+        }
+    }
+
+    // 🔴 4. Previše brojeva u adresi
+    const numbers = senderEmail.match(/\d/g);
+    if (numbers && numbers.length >= 5) {
+        senderScore += 10;
+        reasons.push("Email sadrži veliki broj nasumičnih brojeva.");
+    }
+
+    // 🔴 5. Dugačak domen (random string)
+    const domain = senderEmail.split("@")[1];
+    if (domain && domain.length > 25) {
+        senderScore += 10;
+        reasons.push("Neobično dugačak domen može biti generisan automatski.");
+    }
+
+    if (senderScore > 25) senderScore = 25;
+
+    return { senderScore, reasons };
+}
+
+
+const homoglyphMap = {
+    "i": ["l", "1", "ı"],
+    "l": ["1", "i", "ı"],
+    "o": ["0", "Ο"],  // latinski O i nula
+    "a": ["@","α"]
+};
+
+const diacriticsMap = {
+    "č": "[čc]",
+    "ć": "[ćc]",
+    "š": "[šs]",
+    "đ": "[đd]",
+    "ž": "[žz]",
+    "Č": "[ČC]",
+    "Ć": "[ĆC]",
+    "Š": "[ŠS]",
+    "Đ": "[ĐD]",
+    "Ž": "[ŽZ]"
+};
+
+function buildDiacriticRegex(word) {
+    // zamenjuje svaki karakter koji ima dijakritik sa [xX] verzijom
+    return word.split("").map(c => diacriticsMap[c] || c).join("");
+}
+
+function checkHomoglyphs(text, keywords) {
+    let score = 0;
+    let reasons = [];
+
+    keywords.forEach(word => {
+        const regex = new RegExp(word.split("").map(c => {
+            const chars = [c, ...(homoglyphMap[c]||[])].join("");
+            return `[${chars}]`;
+        }).join(""), "gi");
+
+        if (text.match(regex)) {
+            score += 15;
+            reasons.push(`Mogući homoglyph napad detektovan: "${word}" u tekstu.`);
+        }
+    });
+
+    return { score, reasons };
+}
 /* ===================================================== */
 
 function analyzeEmail(text) {
@@ -60,7 +164,7 @@ function analyzeEmail(text) {
     let linguisticScore = 0;
 
     for (const word in riskyWords) {
-        const occurrences = (lowerText.match(new RegExp(word, "g")) || []).length;
+        const occurrences = (lowerText.match(new RegExp(word, "gi")) || []).length;
 
         if (occurrences > 0) {
             linguisticScore += riskyWords[word].points * occurrences;
@@ -158,6 +262,14 @@ function analyzeEmail(text) {
 
 
     if (totalScore > 100) totalScore = 100;
+
+    const senderResult = analyzeSender();
+    totalScore += senderResult.senderScore;
+    reasons = reasons.concat(senderResult.reasons);
+
+    const hgResult = checkHomoglyphs(lowerText, ["paypal","bank","banka","mastercard"]);
+    totalScore += hgResult.score;
+    reasons = reasons.concat(hgResult.reasons);
 
     return { score: totalScore, reasons };
 }
