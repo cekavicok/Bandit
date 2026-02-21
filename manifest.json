@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Bandid DEMO",
   "version": "1.0",
-  "description": "Jednostavna demo ekstenzija za proveru phishing poruka.",
+  "description": "Jednostavna demo ekstenzija za proveru phishing poruka. novo",
   
   "permissions": ["activeTab", "scripting"],
 
