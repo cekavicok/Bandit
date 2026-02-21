@@ -2,6 +2,7 @@ function extractEmailContainer() {
     // Gmail telo maila
     return document.querySelector('.ii.gt > div.a3s'); 
 }
+//skibidi
 
 
 function extractEmailText() {
