@@ -288,17 +288,15 @@ function showResult(result) {
     panel.style.top = "20px";
     panel.style.right = "20px";
     panel.style.zIndex = "9999";
-    panel.style.padding = "15px";
-    panel.style.border = "2px solid black";
-    panel.style.maxWidth = "350px";
+    panel.style.padding = "30px";
+    panel.style.maxWidth = "500px";
     panel.style.fontFamily = "'DM Sans', Arial, sans-serif";
-    panel.style.borderRadius = "8px"; // Adding a slight radius for a modern look
-    panel.style.color = "#000000";
-    panel.style.backgroundColor = "#FF6767";
+    panel.style.borderRadius = "5px"; // Adding a slight radius for a modern look
+   
 
-    let riskColor = "green";
-    if (result.score >= 70) riskColor = "red";
-    else if (result.score >= 40) riskColor = "orange";
+    let riskColor = "#9AFF8D";
+    if (result.score >= 70) riskColor = "#DE6464";
+    else if (result.score >= 40) riskColor = "#FFD752";
 
     panel.innerHTML = `
         <h3 style="color:${riskColor}">
@@ -338,17 +336,36 @@ function addScanButton() {
     // Kreiraj dugme
     const button = document.createElement("button");
     button.id = "phishing-btn";
-    button.innerText = "Proveri phishing";
+    button.innerHTML = `
+    <span>Analiziraj</span>
+    <svg width="17" height="auto" viewBox="0 0 42 37" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 12px;">
+        <path d="M37.2092 27.7462L26.4092 21.5791L30.5786 37H21.0031V24.6687L9.57856 35.953L4.79387 27.7553L15.6 21.5881L0 17.4545L4.7908 9.25683L15.5939 15.424L11.4214 0H20.9969V12.3313L32.4153 1.05004L37.2061 9.24775L26.4061 15.4149L42 19.5485L37.2092 27.7462Z" fill="black"/>
+    </svg>
+    `;
 
+    // Positioning
     button.style.position = "fixed";
     button.style.bottom = "20px";
     button.style.right = "20px";
     button.style.zIndex = "9999";
-    button.style.padding = "10px";
-    button.style.backgroundColor = "red";
-    button.style.color = "white";
+
+    // Styling to match the image
+    button.style.backgroundColor = "#ff6b6b"; // The specific coral/red shade
+    button.style.color = "black";              // Bold black text as seen in image
+    button.style.fontSize = "16px";            // Adjust based on your preference
+    button.style.fontWeight = "bold";
+    button.style.fontFamily = "sans-serif";
+    button.style.padding = "12px 16px";
+    button.style.borderRadius = "5px";        // Smooth rounded corners
     button.style.border = "none";
     button.style.cursor = "pointer";
+    button.style.display = "flex";
+    button.style.alignItems = "center";
+    button.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)"; // Optional: adds a bit of depth
+
+    // Hover effect
+    button.onmouseover = () => button.style.backgroundColor = "#ff5252";
+    button.onmouseout = () => button.style.backgroundColor = "#ff6b6b";
 
     button.addEventListener("click", () => {
         const emailText = extractEmailText();
