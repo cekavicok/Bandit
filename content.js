@@ -288,10 +288,12 @@ function showResult(result) {
     panel.style.right = "20px";
     panel.style.zIndex = "9999";
     panel.style.padding = "15px";
-    panel.style.backgroundColor = "white";
     panel.style.border = "2px solid black";
     panel.style.maxWidth = "350px";
-    panel.style.fontFamily = "Arial";
+    panel.style.fontFamily = "'DM Sans', Arial, sans-serif";
+    panel.style.borderRadius = "8px"; // Adding a slight radius for a modern look
+    panel.style.color = "#000000";
+    panel.style.backgroundColor = "#FF6767";
 
     let riskColor = "green";
     if (result.score >= 70) riskColor = "red";
