@@ -1,5 +1,7 @@
 # Bandit — Phishing Detection Browser Extension
 
+
+![Bandit Banner](assets/Media1gif.gif)
 > *In Catan, when you roll a 7, the Bandit moves — and someone loses their resources. In the digital world, we move the Bandit onto the scammers.*
 
 Bandit is a browser extension that detects phishing emails in real time, educates users about social engineering tactics, and helps organizations measure and improve their cybersecurity posture.
